@@ -1,0 +1,186 @@
+--================ SERVICES =================--
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
+local Lighting = game:GetService("Lighting")
+local Analytics = game:GetService("RbxAnalyticsService")
+
+local player = Players.LocalPlayer
+
+--================ CONFIG =================--
+local KEY_URL = "https://legitxwx.github.io/TobaKey/"
+local SCRIPT_URL = "https://your-script-url.lua"
+
+--================ OBFUSCATION =================--
+local function d(s) return s end -- light wrapper (paid-style illusion)
+
+--================ HWID =================--
+local HWID = (gethwid and gethwid()) or Analytics:GetClientId()
+local BINDS = {}
+
+--================ BLUR =================--
+local blur = Instance.new("BlurEffect")
+blur.Size = 0
+blur.Parent = Lighting
+TweenService:Create(blur, TweenInfo.new(0.4), {Size = 18}):Play()
+
+--================ GUI =================--
+local gui = Instance.new("ScreenGui", player.PlayerGui)
+gui.ResetOnSpawn = false
+
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0,460,0,540)
+main.Position = UDim2.new(0.5,-230,0.5,-270)
+main.BackgroundColor3 = Color3.fromRGB(18,18,18)
+main.Active = true
+main.Scale = 0
+
+Instance.new("UICorner", main).CornerRadius = UDim.new(0,20)
+
+local stroke = Instance.new("UIStroke", main)
+stroke.Color = Color3.fromRGB(80,80,80)
+stroke.Thickness = 2
+stroke.Transparency = 0.2
+
+TweenService:Create(main, TweenInfo.new(0.5, Enum.EasingStyle.Back), {Scale = 1}):Play()
+
+--================ GLOW =================--
+task.spawn(function()
+    while main.Parent do
+        TweenService:Create(stroke, TweenInfo.new(1.2), {Transparency = 0.6}):Play()
+        task.wait(1.2)
+        TweenService:Create(stroke, TweenInfo.new(1.2), {Transparency = 0.2}):Play()
+        task.wait(1.2)
+    end
+end)
+
+--================ DRAG =================--
+do
+    local drag, start, pos
+    main.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            drag = true
+            start = i.Position
+            pos = main.Position
+            i.Changed:Connect(function()
+                if i.UserInputState == Enum.UserInputState.End then drag = false end
+            end)
+        end
+    end)
+    UIS.InputChanged:Connect(function(i)
+        if drag and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+            local dlt = i.Position - start
+            main.Position = UDim2.new(pos.X.Scale, pos.X.Offset + dlt.X, pos.Y.Scale, pos.Y.Offset + dlt.Y)
+        end
+    end)
+end
+
+--================ CONTENT =================--
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1,0,0,50)
+title.Position = UDim2.new(0,0,0,30)
+title.BackgroundTransparency = 1
+title.Text = "Premium Access"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 28
+title.TextColor3 = Color3.new(1,1,1)
+
+local input = Instance.new("TextBox", main)
+input.Size = UDim2.new(0.85,0,0,50)
+input.Position = UDim2.new(0.075,0,0,140)
+input.PlaceholderText = "Enter key..."
+input.Text = ""
+input.Font = Enum.Font.Gotham
+input.TextSize = 18
+input.TextColor3 = Color3.new(1,1,1)
+input.BackgroundColor3 = Color3.fromRGB(30,30,30)
+Instance.new("UICorner", input).CornerRadius = UDim.new(0,14)
+
+local confirm = Instance.new("TextButton", main)
+confirm.Size = UDim2.new(0.7,0,0,48)
+confirm.Position = UDim2.new(0.15,0,0,210)
+confirm.Text = "Verify Access"
+confirm.Font = Enum.Font.GothamBold
+confirm.TextSize = 20
+confirm.TextColor3 = Color3.new(1,1,1)
+confirm.BackgroundColor3 = Color3.fromRGB(60,60,60)
+Instance.new("UICorner", confirm).CornerRadius = UDim.new(0,14)
+
+local getKey = Instance.new("TextButton", main)
+getKey.Size = UDim2.new(0.6,0,0,40)
+getKey.Position = UDim2.new(0.2,0,0,275)
+getKey.Text = "Get Key"
+getKey.Font = Enum.Font.Gotham
+getKey.TextSize = 18
+getKey.TextColor3 = Color3.fromRGB(200,200,200)
+getKey.BackgroundColor3 = Color3.fromRGB(25,25,25)
+Instance.new("UICorner", getKey).CornerRadius = UDim.new(0,14)
+
+local countdown = Instance.new("TextLabel", main)
+countdown.Size = UDim2.new(1,0,0,20)
+countdown.Position = UDim2.new(0,0,0,330)
+countdown.BackgroundTransparency = 1
+countdown.Font = Enum.Font.Gotham
+countdown.TextSize = 14
+countdown.TextColor3 = Color3.fromRGB(150,150,150)
+
+--================ BUTTON FX =================--
+local function animate(btn)
+    btn.MouseEnter:Connect(function()
+        TweenService:Create(btn,TweenInfo.new(0.15),{Size = btn.Size + UDim2.new(0,6,0,4)}):Play()
+    end)
+    btn.MouseLeave:Connect(function()
+        TweenService:Create(btn,TweenInfo.new(0.15),{Size = btn.Size - UDim2.new(0,6,0,4)}):Play()
+    end)
+end
+animate(confirm)
+animate(getKey)
+
+--================ LOADER =================--
+local loader = Instance.new("TextLabel", gui)
+loader.Size = UDim2.new(1,0,1,0)
+loader.BackgroundColor3 = Color3.new(0,0,0)
+loader.BackgroundTransparency = 0.45
+loader.Text = "Executing..."
+loader.Font = Enum.Font.GothamBold
+loader.TextSize = 42
+loader.TextColor3 = Color3.new(1,1,1)
+loader.Visible = false
+
+--================ FETCH =================--
+local function fetch()
+    local ok, html = pcall(function()
+        return game:HttpGet(KEY_URL)
+    end)
+    if not ok then return end
+    return html:match("KEY:([A-Z0-9%-]+)"), tonumber(html:match("EXP:(%d+)"))
+end
+
+--================ ACTIONS =================--
+getKey.MouseButton1Click:Connect(function()
+    setclipboard(KEY_URL)
+    getKey.Text = "Link Copied"
+    task.wait(1.2)
+    getKey.Text = "Get Key"
+end)
+
+confirm.MouseButton1Click:Connect(function()
+    local typed = input.Text
+    local key, exp = fetch()
+    if not key or not exp then input.Text = ""; input.PlaceholderText = "Fetch failed"; return end
+    if os.time() > exp then input.Text = ""; input.PlaceholderText = "Key expired"; return end
+    if typed ~= key then input.Text = ""; input.PlaceholderText = "Invalid key"; return end
+    if BINDS[key] and BINDS[key] ~= HWID then input.Text = ""; input.PlaceholderText = "Key already used"; return end
+
+    BINDS[key] = HWID
+
+    gui:Destroy()
+    TweenService:Create(blur, TweenInfo.new(0.3), {Size = 0}):Play()
+    task.delay(0.35, function() blur:Destroy() end)
+
+    loader.Visible = true
+    task.wait(1.5)
+    loader:Destroy()
+
+    loadstring(game:HttpGet(SCRIPT_URL))()
+end)
